@@ -1,0 +1,11 @@
+language: objc
+
+install:
+  - sudo npm install -g cordova
+  - sudo npm install -g ios-deploy
+  - sudo npm install -g ios-sim
+
+script:
+  - cd src
+  - make all
+
