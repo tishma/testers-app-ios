@@ -6,6 +6,5 @@ install:
   - sudo npm install -g ios-sim
 
 script:
-  - cd src
-  - make all
+  - make -C src all
 
