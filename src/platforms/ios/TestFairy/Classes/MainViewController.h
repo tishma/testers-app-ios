@@ -30,6 +30,9 @@
 #import <Cordova/CDVCommandQueue.h>
 
 @interface MainViewController : CDVViewController
+{
+	NSString *token;
+}
 
 @end
 

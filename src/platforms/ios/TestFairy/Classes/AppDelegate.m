@@ -77,6 +77,15 @@
 #else
         self.viewController = [[[MainViewController alloc] init] autorelease];
 #endif
+	
+	if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+		UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIRemoteNotificationTypeBadge|UIRemoteNotificationTypeSound|UIRemoteNotificationTypeAlert|UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound) categories:nil];
+		[[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+		[[UIApplication sharedApplication] registerForRemoteNotifications];
+	} else {
+		UIRemoteNotificationType myTypes = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound;
+		[[UIApplication sharedApplication] registerForRemoteNotificationTypes:myTypes];
+	}
 
     // Set your app's start page by setting the <content src='foo.html' /> tag in config.xml.
     // If necessary, uncomment the line below to override it.
@@ -123,7 +132,7 @@
         stringByReplacingOccurrencesOfString:@"<" withString:@""]
         stringByReplacingOccurrencesOfString:@">" withString:@""]
         stringByReplacingOccurrencesOfString:@" " withString:@""];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:CDVRemoteNotification object:token];
 }
 

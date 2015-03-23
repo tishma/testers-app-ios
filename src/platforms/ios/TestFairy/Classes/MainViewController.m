@@ -27,6 +27,8 @@
 
 #import "MainViewController.h"
 
+#define kCookieURL @"https://my.testfairy.com/register-notification-cookie/?token="
+
 @implementation MainViewController
 
 - (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
@@ -49,8 +51,25 @@
         // _commandDelegate = [[MainCommandDelegate alloc] initWithViewController:self];
         // Uncomment to override the CDVCommandQueue used
         // _commandQueue = [[MainCommandQueue alloc] initWithViewController:self];
+		
+		token = @"";
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(tokenChanged:)
+													 name:CDVRemoteNotification
+												   object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(cookiesChanged)
+													 name:NSHTTPCookieManagerCookiesChangedNotification
+												   object:nil];
     }
     return self;
+}
+
+- (void)tokenChanged:(NSNotification *)tokenObject
+{
+	if ([[tokenObject object] isKindOfClass:[NSString class]]) {
+		token = [tokenObject object];
+	}
 }
 
 - (void)didReceiveMemoryWarning
@@ -67,8 +86,36 @@
 {
     // View defaults to full size.  If you want to customize the view's size, or its subviews (e.g. webView),
     // you can do so here.
-
+	
     [super viewWillAppear:animated];
+}
+
+- (void)cookiesChanged
+{
+	NSHTTPCookie *cookie = nil;
+	for (NSHTTPCookie *curCookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
+	{
+		if ([[[curCookie name] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] isEqualToString:@"l"]) {
+			cookie = curCookie;
+			break;
+		}
+	}
+	
+	if (cookie && token && [token isKindOfClass:[NSString class]])
+	{
+		NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
+										initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", kCookieURL,
+																		  [token stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+
+		NSArray* cookies = [NSArray arrayWithObjects: cookie, nil];
+	
+		NSDictionary * headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
+	
+		[request setAllHTTPHeaderFields:headers];
+		[NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+							   completionHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+		 }];
+	}
 }
 
 - (void)viewDidLoad
@@ -105,6 +152,8 @@
 {
     // Black base color for background matches the native apps
     theWebView.backgroundColor = [UIColor blackColor];
+	
+	[self cookiesChanged];
 
     return [super webViewDidFinishLoad:theWebView];
 }
