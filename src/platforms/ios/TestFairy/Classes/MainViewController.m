@@ -40,6 +40,7 @@
         // Uncomment to override the CDVCommandQueue used
         // _commandQueue = [[MainCommandQueue alloc] initWithViewController:self];
     }
+	
     return self;
 }
 
@@ -47,21 +48,15 @@
 {
     self = [super init];
     if (self) {
-        // Uncomment to override the CDVCommandDelegateImpl used
-        // _commandDelegate = [[MainCommandDelegate alloc] initWithViewController:self];
-        // Uncomment to override the CDVCommandQueue used
-        // _commandQueue = [[MainCommandQueue alloc] initWithViewController:self];
-		
-		token = @"";
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(tokenChanged:)
-													 name:CDVRemoteNotification
-												   object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(cookiesChanged)
-													 name:NSHTTPCookieManagerCookiesChangedNotification
-												   object:nil];
+	token = @"";
+	    
+	// callback when push notification token has been received
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenChanged:) name:CDVRemoteNotification object:nil];
+	    
+	// callback when webview cookies changed (check cookie "l")
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cookiesChanged) name:NSHTTPCookieManagerCookiesChangedNotification object:nil];
     }
+	
     return self;
 }
 
@@ -90,31 +85,27 @@
     [super viewWillAppear:animated];
 }
 
+// testfairy
 - (void)cookiesChanged
 {
 	NSHTTPCookie *cookie = nil;
-	for (NSHTTPCookie *curCookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
-	{
+	for (NSHTTPCookie *curCookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+		// user has logged in and now has the "l" cookie
 		if ([[[curCookie name] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] isEqualToString:@"l"]) {
 			cookie = curCookie;
 			break;
 		}
 	}
 	
-	if (cookie && token && [token isKindOfClass:[NSString class]])
-	{
-		NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
-										initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", kCookieURL,
-																		  [token stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+	if (cookie && token && [token isKindOfClass:[NSString class]]) {
+		NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", kCookieURL, [token stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
 
 		NSArray* cookies = [NSArray arrayWithObjects: cookie, nil];
 	
-		NSDictionary * headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
+		NSDictionary *headers = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
 	
 		[request setAllHTTPHeaderFields:headers];
-		[NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
-							   completionHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
-		 }];
+		[NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {}];
 	}
 }
 
