@@ -5,6 +5,24 @@ install:
   - sudo npm install -g ios-deploy
   - sudo npm install -g ios-sim
 
+before_script:
+  - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in scripts/certs/apple.cer.enc -d -a -out scripts/certs/apple.cer
+  - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in scripts/certs/cert-dev.cer.enc -d -a -out scripts/certs/cert-dev.cer
+  - openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in scripts/certs/cert-dev.p12.enc -d -a -out scripts/certs/cert-dev.p12
+
+  - security create-keychain -p travis ios-build.keychain
+  - security default-keychain -s ios-build.keychain
+  - security unlock-keychain -p travis ios-build.keychain
+  - security set-keychain-settings -t 3600 -l ~/Library/Keychains/ios-build.keychain
+
+  - security import scripts/certs/apple.cer -k ~/Library/Keychains/ios-build.keychain -T /usr/bin/codesign
+  - security import scripts/certs/cert-dev.cer -k ~/Library/Keychains/ios-build.keychain -T /usr/bin/codesign
+  - security import scripts/certs/cert-dev.p12 -k ~/Library/Keychains/ios-build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
+
 script:
   - make -C src all
 
+env:
+  global:
+    - secure: l3kBB5rpJyx5LxKp0paF6rAfSue63umSXwBz8YtlV1nfDO42TLqxhoKgTxSXmGYkDaSmSXBw5l5YbB1KDvqSadbt3ouWaxQTbYeb215mosbTWw97phuA+HMRuOWn0vmutA8KaGyUMohzBi2F69N9CgmW0UmQKimLhobP3kBCxyE=
+    - secure: cAuQLOpUe7JYzy/PmeuKwpz981S2muLeNuDvMv43fK/uNfH18KNh3yCJ9an9qumcHYl7pSpoltx12zgkr36VTXHcxw2DQBECoufG62EGBuSSA4RQGBJooDv7sC7mzhCAsGZJQP0os505/C6VWyyVPH1xkebX8Qsc6Nnum+3cmX8=
