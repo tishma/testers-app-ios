@@ -20,7 +20,7 @@ before_script:
   - security import scripts/certs/cert-dev.cer -k ~/Library/Keychains/ios-build.keychain -T /usr/bin/codesign
   - security import scripts/certs/cert-dev.p12 -k ~/Library/Keychains/ios-build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
   - mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-  - cp scripts/certs/cert-dev.mobileprovision" ~/Library/MobileDevice/Provisioning\ Profiles/
+  - cp scripts/certs/cert-dev.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
 script:
   - make -C src all
