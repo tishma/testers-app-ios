@@ -1,33 +1,27 @@
-all: release adhoc 
 
-adhoc: build/TestFairy-adhoc.ipa 
+all: adhoc appstore
 
-release: build/TestFairy-release.ipa
+adhoc: 
+	PWD=`pwd`
+	mkdir -p build
+	rm -rf "build/.adhoc" "build/TestFairy-AdHoc.ipa"
+	cordova prepare ios --release --device
+	xcodebuild -workspace platforms/ios/TestFairy.xcodeproj/project.xcworkspace -scheme TestFairy -configuration "Ad Hoc" DSTROOT="$(PWD)/build/.adhoc" archive 
+	xcrun -sdk iphoneos lipo -info $(PWD)/build/.adhoc/Applications/TestFairy.app/TestFairy | grep "armv7 armv7s arm64" 
+	mv build/.adhoc/Applications build/.adhoc/Payload
+	(cd $(PWD)/build/.adhoc/; zip -rp9 ../TestFairy-AdHoc.ipa Payload)
+	-rm -rf build/.adhoc
 
-# appstore: build/TestFairy-appstore.ipa
-
-platforms/ios/build/device/TestFairy.app/TestFairy:
-	cordova build ios --release --device
-	xcrun -sdk iphoneos lipo -info ./platforms/ios/build/device/TestFairy.app/TestFairy | grep "armv7 armv7s arm64" 
-
-build/TestFairy-adhoc.ipa: platforms/ios/build/device/TestFairy.app/TestFairy
-	-rm -f $@
-	-rm -rf platforms/ios/build/device/.package
-	mkdir -p build platforms/ios/build/device/.package/Payload
-	cp -R platforms/ios/build/device/TestFairy.app platforms/ios/build/device/.package/Payload
-	cp ../scripts/certs/cert-adhoc.mobileprovision platforms/ios/build/device/.package/Payload/TestFairy.app/embedded.mobileprovision
-	codesign -v -f -i com.testfairy.app -s "iPhone Distribution: TestFairy LTD (8Z9PUDZ69F)" platforms/ios/build/device/.package/Payload/TestFairy.app
-	(cd platforms/ios/build/device/.package; zip -rp9 ../../../../../$@ Payload)
-	-rm -rf platforms/ios/build/device/.package
-
-build/TestFairy-release.ipa: platforms/ios/build/device/TestFairy.app/TestFairy
-	-rm -f $@ 
-	-rm -rf platforms/ios/build/device/.package
-	mkdir -p build platforms/ios/build/device/.package/Payload
-	cp -R platforms/ios/build/device/TestFairy.app platforms/ios/build/device/.package/Payload
-	codesign -v -f -i com.testfairy.app platforms/ios/build/device/.package/Payload/TestFairy.app
-	(cd platforms/ios/build/device/.package; zip -rp9 ../../../../../$@ Payload)
-	-rm -rf platforms/ios/build/device/.package
+appstore: 
+	PWD=`pwd`
+	mkdir -p build
+	rm -rf "build/.appstore" "build/TestFairy-AppStore.ipa"
+	cordova prepare ios --release --device
+	xcodebuild -workspace platforms/ios/TestFairy.xcodeproj/project.xcworkspace -scheme TestFairy -configuration "App Store" DSTROOT="$(PWD)/build/.appstore" archive 
+	xcrun -sdk iphoneos lipo -info $(PWD)/build/.appstore/Applications/TestFairy.app/TestFairy | grep "armv7 armv7s arm64" 
+	mv build/.appstore/Applications build/.appstore/Payload
+	(cd $(PWD)/build/.appstore/; zip -rp9 ../TestFairy-AppStore.ipa Payload)
+	-rm -rf build/.appstore
 
 clean:
 	-rm -rf ./build
