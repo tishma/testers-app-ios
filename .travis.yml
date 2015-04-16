@@ -32,7 +32,7 @@ before_script:
   - cp scripts/certs/cert-appstore.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
 script:
-  - make -C src adhoc appstore
+  - (cd src; make adhoc appstore)
 
 env:
   global:
