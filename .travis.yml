@@ -44,8 +44,8 @@ deploy:
   api_key:
     secure: lHIYw1cWUAsV4U9089W0lQcTlI/2vyeL5Kia+JgyU6Rg58iGCpLR6Y6qm+VYvp6fE/84usU6CTIxEhyxqA6D9nzpVlAjES7N8q/UASXtn8wXIV4VqycxqratKx4MrY0ML0vVifE39/sw1wpMeAbGjSRxuypiXufpfoE4t1tj1NQ=
   file: 
-    - build/TestFairy-AdHoc.ipa
-    - build/TestFairy-AppStore.ipa
+    - src/build/TestFairy-AdHoc.ipa
+    - src/build/TestFairy-AppStore.ipa
   skip_cleanup: true
   on:
     tags: true
