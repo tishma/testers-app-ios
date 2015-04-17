@@ -38,3 +38,16 @@ env:
   global:
     - secure: l3kBB5rpJyx5LxKp0paF6rAfSue63umSXwBz8YtlV1nfDO42TLqxhoKgTxSXmGYkDaSmSXBw5l5YbB1KDvqSadbt3ouWaxQTbYeb215mosbTWw97phuA+HMRuOWn0vmutA8KaGyUMohzBi2F69N9CgmW0UmQKimLhobP3kBCxyE=
     - secure: cAuQLOpUe7JYzy/PmeuKwpz981S2muLeNuDvMv43fK/uNfH18KNh3yCJ9an9qumcHYl7pSpoltx12zgkr36VTXHcxw2DQBECoufG62EGBuSSA4RQGBJooDv7sC7mzhCAsGZJQP0os505/C6VWyyVPH1xkebX8Qsc6Nnum+3cmX8=
+
+deploy:
+  provider: releases
+  api_key:
+    secure: lHIYw1cWUAsV4U9089W0lQcTlI/2vyeL5Kia+JgyU6Rg58iGCpLR6Y6qm+VYvp6fE/84usU6CTIxEhyxqA6D9nzpVlAjES7N8q/UASXtn8wXIV4VqycxqratKx4MrY0ML0vVifE39/sw1wpMeAbGjSRxuypiXufpfoE4t1tj1NQ=
+  file: 
+    - build/TestFairy-AdHoc.ipa
+    - build/TestFairy-AppStore.ipa
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+
