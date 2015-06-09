@@ -57,9 +57,10 @@
 	// callback when webview cookies changed (check cookie "l")
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cookiesChanged) name:NSHTTPCookieManagerCookiesChangedNotification object:nil];
 
-	// append TestersApp/1.1 to user-agent
-	NSString *ua = [CDVUserAgentUtil originalUserAgent];
-	self.baseUserAgent = [ua stringByAppendingString: @" TestersApp/1.1"];
+	// update user-agent
+	NSString *userAgent = [CDVUserAgentUtil originalUserAgent];
+	NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+	self.baseUserAgent = [userAgent stringByAppendingString: [NSString stringWithFormat:@" TestersApp/%@", version]];
     }
 	
     return self;
