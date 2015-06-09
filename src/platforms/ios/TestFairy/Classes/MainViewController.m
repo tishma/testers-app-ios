@@ -26,6 +26,7 @@
 //
 
 #import "MainViewController.h"
+#import <Cordova/CDVUserAgentUtil.h>
 
 #define kCookieURL @"https://my.testfairy.com/register-notification-cookie/?token="
 
@@ -55,6 +56,10 @@
 	    
 	// callback when webview cookies changed (check cookie "l")
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cookiesChanged) name:NSHTTPCookieManagerCookiesChangedNotification object:nil];
+
+	// append TestersApp/1.1 to user-agent
+	NSString *ua = [CDVUserAgentUtil originalUserAgent];
+	self.baseUserAgent = [ua stringByAppendingString: @" TestersApp/1.1"];
     }
 	
     return self;
@@ -111,8 +116,9 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+	// viewDidLoad creates self.webView
+	[super viewDidLoad];
+
 }
 
 - (void)viewDidUnload
